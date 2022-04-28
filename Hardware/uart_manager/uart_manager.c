@@ -1,3 +1,8 @@
+#include "main.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+#include "queue.h"
 #include "uart_manager.h"
 #include "string.h"
 

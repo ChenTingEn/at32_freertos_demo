@@ -10,11 +10,12 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "at32f4xx_it.h"
-#include "at32_board.h"
-#include "uart_manager.h"
+#include "main.h"
 #include "FreeRTOS.h"
-#include "queue.h"
 #include "task.h"
+#include "semphr.h"
+#include "queue.h"
+#include "at32_board.h"
 
 /** @addtogroup AT32F413_StdPeriph_Templates
   * @{
@@ -129,17 +130,27 @@ void DebugMon_Handler(void)
 void USART1_IRQHandler(void)
 {
     u8 i;
+    struct uart_queue_msg *qmsg;
     BaseType_t	pxHigherPriorityTaskWoken = pdFALSE;
-    QueueHandle_t xReturn = uart_port_queue_get(UART1_ID);
+    
     u16	USART1_CurrDataCounter = 0;
     if( USART_GetFlagStatus(USART1,USART_FLAG_IDLEF) != RESET ){
         DMA_ChannelEnable(USART1_DMA_R_CHANNEL, DISABLE);
         DMA_ClearFlag( USART1_DMA_REC_FINISH );
         USART1_CurrDataCounter = USART1_RECBUFF_SIZE - DMA_GetCurrDataCounter(USART1_DMA_R_CHANNEL);
-        xQueueSendFromISR(xReturn,uart_port_rxbuff_get(UART1_ID),&pxHigherPriorityTaskWoken);
-//        Usart1_WaitReadNumber+=USART2_CurrDataCounter;
-//        Usart1_ReceiveBufferState = USART2_IsNotWriteing;
-
+        QueueHandle_t xReturn = uart_port_queue_get(UART1_ID);
+        
+        qmsg = (struct uart_queue_msg *)pvPortMalloc(sizeof(struct uart_queue_msg));
+        if(qmsg == NULL)
+            return ;
+        
+        qmsg->ID = UART1_ID;
+        qmsg->len = USART1_CurrDataCounter;
+        memcpy(qmsg->data,uart_port_rxbuff_get(UART1_ID),USART1_CurrDataCounter);
+        
+        xQueueSendFromISR(xReturn,qmsg->data,&pxHigherPriorityTaskWoken);
+        xSemaphoreGiveFromISR(xsemaphore_recf1_get(),&pxHigherPriorityTaskWoken);
+        
         USART1_DMA_R_CHANNEL->TCNT = USART1_RECBUFF_SIZE;
         DMA_ChannelEnable(USART1_DMA_R_CHANNEL, ENABLE);
 

@@ -1,13 +1,13 @@
 #ifndef __UART_MANAGER_H
 #define __UART_MANAGER_H
+#include "at32f4xx.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+#include "queue.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-
-
-#include "at32f4xx.h"
-#include "FreeRTOS.h"
-#include "queue.h"
 
 #define UART1_ID  0
 #define UART2_ID  1

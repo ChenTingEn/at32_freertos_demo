@@ -8,13 +8,12 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
-//#include "at32_board.h"
+#include  "main.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "queue.h"
 #include "semphr.h"
-#include "uart_manager.h"
+#include "queue.h"
+//#include "at32_board.h"
 
 /* USER CODE END PM */
 
@@ -23,6 +22,7 @@
 #define USART2_TASK_STACK_SIZE 100
 #define LED_TASK_STACK_SIZE 100
 /* Private function prototypes -----------------------------------------------*/
+u8 u1recebuff[USART2_MAX_RX_LEN] = {0};
 u8 u2recebuff[USART2_MAX_RX_LEN] = {0};
 u8 usart2_waitread = 0;
 extern struct _uart_manager uart_manager;
@@ -32,6 +32,7 @@ extern struct _uart_manager uart_manager;
 static TaskHandle_t uart1_task_handle = NULL;
 static TaskHandle_t uart2_task_handle = NULL;
 static TaskHandle_t LED_task_handle = NULL;
+static SemaphoreHandle_t xsemaphore_recf1 = NULL;
 static SemaphoreHandle_t xsemaphore_recf2 = NULL;
 
 //extern USART_Type * DEBUG_USARTx;
@@ -48,6 +49,14 @@ static void uart2_task_Function(void *pvParameters);
 static void LED_task_Function(void *pvParameters);
 /* pa6 unlock */
 static void pa6init(void);
+
+SemaphoreHandle_t xsemaphore_recf1_get(){
+    return xsemaphore_recf1;
+}
+
+SemaphoreHandle_t xsemaphore_recf2_get(){
+    return xsemaphore_recf2;
+}
 
 int main(void)
 {
@@ -74,13 +83,17 @@ int main(void)
 static void uart1_task_Function(void *pvParameters)
 {
     uart1_parameter_init(&usart_p1);//初始化结构体
-    //vSemaphoreCreateBinary(xsemaphore_recf1);//创建信号量
+    vSemaphoreCreateBinary(xsemaphore_recf1);//创建信号量
     if(uart_register(&usart_p1,4,4,NULL) != 0){
         while(1);
     }
     //Usart_SendString(USART2,"helloA\n");
     while(1)
     {
+        if(xSemaphoreTake(xsemaphore_recf1,1) != pdFALSE){
+            xQueueReceive(uart_port_queue_get(UART1_ID),u1recebuff,portMAX_DELAY);
+            
+        }
         vTaskDelay(10);
     }
 }
