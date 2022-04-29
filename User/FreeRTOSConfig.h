@@ -99,6 +99,7 @@
 #define configMAX_TASK_NAME_LEN		( 16 )
 #define configUSE_16_BIT_TICKS		0
 #define configIDLE_SHOULD_YIELD		1
+//#define INCLUDE_xTaskGetSchedulerState 1
 //#define configUSE_TIMERS            1
 //#define configTIMER_TASK_PRIORITY   1
 //#define configTIMER_QUEUE_LENGTH    16
@@ -151,8 +152,7 @@ header file. */
 standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
-#define xPortSysTickHandler SysTick_Handler
-
+//#define xPortSysTickHandler SysTick_Handler
 
 #endif /* FREERTOS_CONFIG_H */
 

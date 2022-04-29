@@ -496,6 +496,38 @@ malloc_send_buff_error:
     return -1;
 }
 
+
+void usart1_callback(void)
+{
+    u16 USART1_CurrDataCounter;
+    BaseType_t	pxHigherPriorityTaskWoken = pdFALSE;
+    //    struct uart_queue_msg *qmsg;
+    
+    DMA_ChannelEnable(USART1_DMA_R_CHANNEL, DISABLE);
+    DMA_ClearFlag( USART1_DMA_REC_FINISH );
+    USART1_CurrDataCounter = USART1_RECBUFF_SIZE - DMA_GetCurrDataCounter(USART1_DMA_R_CHANNEL);
+    QueueHandle_t xReturn = uart_port_queue_get(UART1_ID);
+        
+
+//        qmsg = (struct uart_queue_msg *)pvPortMalloc(sizeof(struct uart_queue_msg));
+//        if(qmsg == NULL)
+//            return ;
+//        
+//        qmsg->ID = UART1_ID;
+//        qmsg->len = USART1_CurrDataCounter;
+//        memcpy(qmsg->data,uart_port_rxbuff_get(UART1_ID),USART1_CurrDataCounter);
+//        
+//        xQueueSendFromISR(xReturn,qmsg->data,&pxHigherPriorityTaskWoken);
+    xSemaphoreGiveFromISR(xsemaphore_recf1_get(),&pxHigherPriorityTaskWoken);
+        
+    USART1_DMA_R_CHANNEL->TCNT = USART1_RECBUFF_SIZE;
+    DMA_ChannelEnable(USART1_DMA_R_CHANNEL, ENABLE);
+
+    USART_ReceiveData( USART1_COM ); // Clear IDLE interrupt flag bit
+    if( pxHigherPriorityTaskWoken == pdTRUE )
+        taskYIELD();
+
+}
 //void DMA_USART_Tx_Data(u32 size)
 //{
 //	while(USART1_TX_FLAG){};//等待上一次发送完成（USART1_TX_FLAG为1即还在发送数据）

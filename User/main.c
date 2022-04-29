@@ -49,6 +49,8 @@ static void uart2_task_Function(void *pvParameters);
 static void LED_task_Function(void *pvParameters);
 /* pa6 unlock */
 static void pa6init(void);
+static void TMR6_Init(void);
+
 
 SemaphoreHandle_t xsemaphore_recf1_get(){
     return xsemaphore_recf1;
@@ -62,7 +64,7 @@ int main(void)
 {
     BaseType_t xReturn = pdFAIL;
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-    
+    //TMR6_Init();
     uart_manager_init();
     //pa6init();
     
@@ -90,7 +92,7 @@ static void uart1_task_Function(void *pvParameters)
     //Usart_SendString(USART2,"helloA\n");
     while(1)
     {
-        if(xSemaphoreTake(xsemaphore_recf1,1) != pdFALSE){
+        if(xSemaphoreTake(xsemaphore_recf1,portMAX_DELAY) != pdFALSE){
             xQueueReceive(uart_port_queue_get(UART1_ID),u1recebuff,portMAX_DELAY);
             
         }
@@ -127,7 +129,7 @@ static void LED_task_Function(void *pvParameters)
 {
     while(1)
     {
-        vTaskDelay(100);
+        vTaskDelay(1000);
     }
 }
 
@@ -143,3 +145,26 @@ static void LED_task_Function(void *pvParameters)
 //    GPIO_SetBits(GPIOA,GPIO_Pins_6);
 //}
 
+static void TMR6_Init(void)
+{
+    NVIC_InitType NVIC_InitStructure;
+    TMR_TimerBaseInitType  TMR_TimeBaseStructure;
+    RCC_APB1PeriphClockCmd(RCC_APB1PERIPH_TMR6,ENABLE);
+    
+    NVIC_InitStructure.NVIC_IRQChannel = TMR6_GLOBAL_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+    
+    TMR_TimeBaseStructInit(&TMR_TimeBaseStructure);
+    TMR_TimeBaseStructure.TMR_DIV = 0;
+    TMR_TimeBaseStructure.TMR_CounterMode = TMR_CounterDIR_Up;
+    TMR_TimeBaseStructure.TMR_Period = 119;         //1ms
+    TMR_TimeBaseStructure.TMR_ClockDivision = 0;
+    TMR_TimeBaseStructure.TMR_RepetitionCounter = 0;
+
+    TMR_TimeBaseInit(TMR6, &TMR_TimeBaseStructure);
+    TMR_INTConfig(TMR6, TMR_INT_Overflow, ENABLE);
+    TMR_Cmd(TMR6, ENABLE);
+}
