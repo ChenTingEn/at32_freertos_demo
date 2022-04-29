@@ -17,8 +17,8 @@
 #include "queue.h"
 #include "at32_board.h"
 
-extern void xPortSysTickHandler(void);
-extern BaseType_t xTaskGetSchedulerState(void);
+//extern void xPortSysTickHandler(void);
+//extern BaseType_t xTaskGetSchedulerState(void);
 /** @addtogroup AT32F413_StdPeriph_Templates
   * @{
   */
@@ -120,9 +120,9 @@ void DebugMon_Handler(void)
   * @param  None
   * @retval None
   */
-void SysTick_Handler(void)
-{
-}
+//void SysTick_Handler(void)
+//{
+//}
 
 //void TMR6_GLOBAL_IRQHandler(void)
 //{
