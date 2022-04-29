@@ -125,8 +125,10 @@ static void uart2_task_Function(void *pvParameters)
 
 static void LED_task_Function(void *pvParameters)
 {
-
-
+    while(1)
+    {
+        vTaskDelay(100);
+    }
 }
 
 //static void pa6init()
