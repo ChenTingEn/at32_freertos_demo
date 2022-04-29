@@ -221,7 +221,8 @@ static void usart1_config(struct uart_port *port)
 	NVIC_InitType NVIC_InitStructure;
 	USART_InitType USART_InitStructure;
     
-	RCC_APB2PeriphClockCmd(USART1_GPIO_CLK | USART1_CLK,ENABLE);//开启GPIOA和USART1时钟
+    RCC_AHBPeriphClockCmd(USART1_GPIO_CLK,ENABLE);
+	RCC_APB2PeriphClockCmd(USART1_CLK,ENABLE);//开启GPIOA和USART1时钟
 	//GPIO_PinsRemapConfig(GPIO_Remap_USART1, ENABLE);
     GPIO_PinAFConfig(GPIOA, GPIO_PinsSource9, GPIO_AF_1);
   /* Connect PXx to USART1_Rx */
@@ -260,8 +261,8 @@ static void usart1_config(struct uart_port *port)
     
 	USART_ClearFlag(USART1,USART_FLAG_TRAC);
 	USART_INTConfig(USART1,USART_INT_IDLEF,ENABLE);  //开启串口空闲中断
-	
 	USART_Cmd(USART1, ENABLE);                    //使能串口1 
+    USART_DMACmd(USART1,USART_DMAReq_Tx|USART_DMAReq_Rx,ENABLE);
 }
 
 //串口2初始化
@@ -271,7 +272,8 @@ static void usart2_config(struct uart_port *port)
 	NVIC_InitType NVIC_InitStructure;
 	USART_InitType USART_InitStructure;
     
-	RCC_APB1PeriphClockCmd(USART2_GPIO_CLK | USART2_CLK,ENABLE);
+    RCC_AHBPeriphClockCmd(USART1_GPIO_CLK,ENABLE);
+	RCC_APB1PeriphClockCmd(USART2_CLK,ENABLE);
 //	RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_GPIOD,ENABLE);//开启GPIOD和USART1时钟
 //    RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_AFIO,ENABLE);
 //	GPIO_PinsRemapConfig(GPIO_Remap_USART2, ENABLE);
@@ -313,8 +315,8 @@ static void usart2_config(struct uart_port *port)
     
 	USART_ClearFlag(USART2,USART_FLAG_TRAC);
 	USART_INTConfig(USART2,USART_INT_IDLEF,ENABLE);  //开启串口空闲中断
-	
 	USART_Cmd(USART2, ENABLE);                    //使能串口2 
+    USART_DMACmd(USART2,USART_DMAReq_Tx|USART_DMAReq_Rx,ENABLE);
 }
 
 static void usart1_dma_config(struct uart_port *port)
@@ -325,11 +327,11 @@ static void usart1_dma_config(struct uart_port *port)
 
     RCC_AHBPeriphClockCmd(DMA1_CLOCK, ENABLE);
     
-    NVIC_InitStructure.NVIC_IRQChannel = USART1_DMA_R_CHANNEL_IRQ;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;  
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;  
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;  
-    NVIC_Init(&NVIC_InitStructure);
+//    NVIC_InitStructure.NVIC_IRQChannel = USART1_DMA_R_CHANNEL_IRQ;
+//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;  
+//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;  
+//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;  
+//    NVIC_Init(&NVIC_InitStructure);
 
     NVIC_InitStructure.NVIC_IRQChannel = USART1_DMA_W_CHANNEL_IRQ;				//NVIC通道设置
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2 ;				//抢占优先级
@@ -381,11 +383,11 @@ static void usart2_dma_config(struct uart_port *port)
   
     RCC_AHBPeriphClockCmd(DMA1_CLOCK, ENABLE);
   
-    NVIC_InitStructure.NVIC_IRQChannel = USART2_DMA_R_CHANNEL_IRQ;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;  
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;  
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;  
-    NVIC_Init(&NVIC_InitStructure);
+//    NVIC_InitStructure.NVIC_IRQChannel = USART2_DMA_R_CHANNEL_IRQ;
+//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;  
+//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;  
+//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;  
+//    NVIC_Init(&NVIC_InitStructure);
 
     NVIC_InitStructure.NVIC_IRQChannel = USART2_DMA_W_CHANNEL_IRQ;				//NVIC通道设置
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2 ;				//抢占优先级
