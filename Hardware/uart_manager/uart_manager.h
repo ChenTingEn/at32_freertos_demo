@@ -19,7 +19,7 @@
 #define UART_RECV_QUEUE_MAX_LEN 8
 
 #define  USART1_COM                USART1
-#define  USART1_BAUDRATE           (u32)115200
+#define  USART1_BAUDRATE           115200
 #define  USART1_CLK                RCC_APB2PERIPH_USART1
 #define  USART1_APBxClkCmd         RCC_APB2PeriphClockCmd
 
