@@ -146,6 +146,13 @@ void USART1_IRQHandler(void)
 	}
 }
 
+void USART2_IRQHandler(void)
+{
+    if( USART_GetFlagStatus(USART2,USART_FLAG_IDLEF) != RESET ){
+        usart2_callback();
+	}
+}
+
 void DMA1_Channel3_2_IRQHandler(void)
 {
     if( DMA_GetFlagStatus(DMA1_INT_TC2) != RESET )

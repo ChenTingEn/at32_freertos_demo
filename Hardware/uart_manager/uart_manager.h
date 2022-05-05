@@ -19,7 +19,7 @@
 #define UART_RECV_QUEUE_MAX_LEN 8
 
 #define  USART1_COM                USART1
-#define  USART1_BAUDRATE           115200
+#define  USART1_BAUDRATE           (u32)115200
 #define  USART1_CLK                RCC_APB2PERIPH_USART1
 #define  USART1_APBxClkCmd         RCC_APB2PeriphClockCmd
 
@@ -42,7 +42,7 @@
 #define  USART1_RECBUFF_SIZE        128
 /**************************************************/
 #define  USART2_COM                USART2
-#define  USART2_BAUDRATE           115200
+#define  USART2_BAUDRATE           (u32)115200
 #define  USART2_CLK                RCC_APB1PERIPH_USART2
 #define  USART2_APBxClkCmd         RCC_APB1PeriphClockCmd
 
@@ -202,7 +202,8 @@ u8* uart_port_rxbuff_get(u8 uart_id);
 u8 uart_unregister(u8 uart_id);
 int uart_reset_parameter(struct uart_parameter *parameter);
 void usart1_callback(void);
-    
+void usart2_callback(void);
+u16 uart_port_rxbuffsize_get(u8 uart_id);
 
 #endif 
 
