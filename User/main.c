@@ -13,6 +13,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "queue.h"
+#include "usart.h"
 //#include "at32_board.h"
 
 /* USER CODE END PM */
@@ -92,7 +93,7 @@ static void uart1_task_Function(void *pvParameters)
     //Usart_SendString(USART2,"helloA\n");
     while(1)
     {
-        if(xSemaphoreTake(xsemaphore_recf1,10) != pdFALSE){//portMAX_DELAY
+        if(xSemaphoreTake(xsemaphore_recf1_get(),10) != pdFALSE){//portMAX_DELAY
             //xQueueReceive(uart_port_queue_get(UART1_ID),u1recebuff,0);
             memcpy(u1recebuff , uart_port_rxbuff_get(UART1_ID), uart_port_rxbuffsize_get(UART1_ID) );
             
@@ -116,10 +117,10 @@ static void uart2_task_Function(void *pvParameters)
     //Usart_SendString(USART2,"helloA\n");
     while(1)
     {
-        if(xSemaphoreTake(xsemaphore_recf2, 10) != pdFALSE)
+        if(xSemaphoreTake(xsemaphore_recf2_get(), 10) != pdFALSE)
         {
             //usart2_waitread = uart_wait_recv_data(UART2_ID,u2recebuff,1);
-            //memcpy(u2recebuff , uart_port_rxbuff_get(UART2_ID), uart_port_rxbuffsize_get(UART2_ID) );
+            memcpy(u2recebuff , uart_port_rxbuff_get(UART2_ID), uart_port_rxbuffsize_get(UART2_ID) );
         }
             
 //        vTaskDelay(1);
