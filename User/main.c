@@ -96,6 +96,7 @@ static void uart1_task_Function(void *pvParameters)
         if(xSemaphoreTake(xsemaphore_recf1_get(),10) != pdFALSE){//portMAX_DELAY
             //xQueueReceive(uart_port_queue_get(UART1_ID),u1recebuff,0);
             memcpy(u1recebuff , uart_port_rxbuff_get(UART1_ID), uart_port_rxbuffsize_get(UART1_ID) );
+            uart_send_data(UART1_ID,u1recebuff,sizeof(u1recebuff),1);
             
         }
 //        vTaskDelay(10);
@@ -105,6 +106,7 @@ static void uart1_task_Function(void *pvParameters)
 
 static void uart2_task_Function(void *pvParameters)
 {
+    u16 uart2_rec_len = 0;
     uart2_parameter_init(&usart_p2);//初始化结构体
     
     vSemaphoreCreateBinary(xsemaphore_recf2);//创建信号量
@@ -119,8 +121,9 @@ static void uart2_task_Function(void *pvParameters)
     {
         if(xSemaphoreTake(xsemaphore_recf2_get(), 10) != pdFALSE)
         {
-            //usart2_waitread = uart_wait_recv_data(UART2_ID,u2recebuff,1);
+            //uart2_rec_len = uart_wait_recv_data(UART2_ID,u2recebuff,1);
             memcpy(u2recebuff , uart_port_rxbuff_get(UART2_ID), uart_port_rxbuffsize_get(UART2_ID) );
+            
         }
             
 //        vTaskDelay(1);

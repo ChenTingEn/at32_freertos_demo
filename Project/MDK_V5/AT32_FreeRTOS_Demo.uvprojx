@@ -640,6 +640,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\Hardware\uart_manager\uart_manager.c</FilePath>
             </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Hardware\usart\usart.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1277,6 +1282,11 @@
               <FileName>uart_manager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Hardware\uart_manager\uart_manager.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Hardware\usart\usart.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1916,6 +1926,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\Hardware\uart_manager\uart_manager.c</FilePath>
             </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Hardware\usart\usart.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -2553,6 +2568,11 @@
               <FileName>uart_manager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Hardware\uart_manager\uart_manager.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Hardware\usart\usart.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3192,6 +3212,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\Hardware\uart_manager\uart_manager.c</FilePath>
             </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Hardware\usart\usart.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -3528,7 +3553,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F421C8T7,USE_STDPERIPH_DRIVER,AT_START_F421_V1_0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\AT32F4xx_StdPeriph_Driver\inc;..\..\..\Libraries\CMSIS\CM4\CoreSupport;..\..\Middlewares\FreeRTOS\Source\include;..\..\Libraries\CMSIS\CM4\DeviceSupport;..\..\Middlewares\FreeRTOS\Source\portable\RVDS\ARM_CM4F;..\..\Middlewares\FreeRTOS\Source\portable\RVDS\ARM_CM3;..\..\Bsp;..\..\User;..\..\Hardware\SPI;..\..\Hardware\USART;..\..\Hardware\XV7011;..\..\Hardware\kalman;..\..\Hardware\uart_manager</IncludePath>
+              <IncludePath>..\..\Libraries\AT32F4xx_StdPeriph_Driver\inc;..\..\..\Libraries\CMSIS\CM4\CoreSupport;..\..\Middlewares\FreeRTOS\Source\include;..\..\Libraries\CMSIS\CM4\DeviceSupport;..\..\Middlewares\FreeRTOS\Source\portable\RVDS\ARM_CM4F;..\..\Middlewares\FreeRTOS\Source\portable\RVDS\ARM_CM3;..\..\Bsp;..\..\User;..\..\Hardware\uart_manager;..\..\Hardware\usart</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3829,6 +3854,11 @@
               <FileName>uart_manager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Hardware\uart_manager\uart_manager.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Hardware\usart\usart.c</FilePath>
             </File>
           </Files>
         </Group>

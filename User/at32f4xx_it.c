@@ -16,7 +16,7 @@
 #include "semphr.h"
 #include "queue.h"
 #include "at32_board.h"
-
+#include "usart.h"
 //extern void xPortSysTickHandler(void);
 //extern BaseType_t xTaskGetSchedulerState(void);
 /** @addtogroup AT32F413_StdPeriph_Templates
@@ -141,16 +141,40 @@ void DebugMon_Handler(void)
   */
 void USART1_IRQHandler(void)
 {
-    if( USART_GetFlagStatus(USART1,USART_FLAG_IDLEF) != RESET ){
+    if( USART_GetFlagStatus(USART1,USART_FLAG_RDNE) != RESET ){
         usart1_callback();
 	}
+    if( USART_GetFlagStatus(USART1,USART_FLAG_ORERR) != RESET ){
+        USART_ReceiveData( USART1_COM );
+    }
+    if( USART_GetFlagStatus(USART1,USART_FLAG_NERR) != RESET ){
+        USART_ReceiveData( USART1_COM );
+    }
+    if( USART_GetFlagStatus(USART1,USART_FLAG_FERR) != RESET ){
+        USART_ReceiveData( USART1_COM );
+    }
+    if( USART_GetFlagStatus(USART1,USART_FLAG_PERR) != RESET ){
+        USART_ReceiveData( USART1_COM );
+    }
 }
 
 void USART2_IRQHandler(void)
 {
-    if( USART_GetFlagStatus(USART2,USART_FLAG_IDLEF) != RESET ){
+    if( USART_GetFlagStatus(USART2,USART_FLAG_RDNE) != RESET ){
         usart2_callback();
 	}
+    if( USART_GetFlagStatus(USART1,USART_FLAG_ORERR) != RESET ){
+        USART_ReceiveData( USART2_COM );
+    }
+    if( USART_GetFlagStatus(USART2,USART_FLAG_NERR) != RESET ){
+        USART_ReceiveData( USART2_COM );
+    }
+    if( USART_GetFlagStatus(USART2,USART_FLAG_FERR) != RESET ){
+        USART_ReceiveData( USART2_COM );
+    }
+    if( USART_GetFlagStatus(USART2,USART_FLAG_PERR) != RESET ){
+        USART_ReceiveData( USART2_COM );
+    }
 }
 
 void DMA1_Channel3_2_IRQHandler(void)
@@ -159,15 +183,17 @@ void DMA1_Channel3_2_IRQHandler(void)
     {
         //SPI_DMA_CALLBACK();
         DMA_ClearITPendingBit(DMA1_INT_TC2);
+        DMA_ChannelEnable(USART1_DMA_W_CHANNEL,DISABLE);
     }
 
 }
 
 void DMA1_Channel7_4_IRQHandler(void)
 {
-    if( DMA_GetFlagStatus(DMA_INT_TC) != RESET )
+    if( DMA_GetFlagStatus(DMA1_INT_TC4) != RESET )
     {
-        DMA_ClearITPendingBit(DMA_INT_TC);
+        DMA_ClearITPendingBit(DMA1_INT_TC4);
+        DMA_ChannelEnable(USART2_DMA_W_CHANNEL,DISABLE);
     }
 }
 /**

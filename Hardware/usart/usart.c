@@ -1,24 +1,40 @@
 #include  "usart.h"
 
-u8 usart_enable_get(u8 uart_id)
+u8 usart1_enable_get(void)
 {
-    switch(uart_id)
-    {
-        case UART1_ID:
-            if( (USART1->CTRL1) & 0x0E )
-                return 0;
-            else
-                return -1;
-            break;
-        case UART2_ID:
-            if( (USART2->CTRL1) & 0x0E )
-                return 0;
-            else
-                return -1;
-            break;
-    }
+    if( (USART1->CTRL1) & 0x0E )
+        return 0;
+    else
+        return -1;
+}
+u8 usart2_enable_get(void)
+{
+    if( (USART2->CTRL1) & 0x0E )
+        return 0;
+    else
+        return -1;
 }
 
+u8 usart1_send_paper(u8 *send_data,u16 send_data_len)
+{
+    DMA_ClearFlag(USART1_DMA_SEND_FINISH);
+    USART1_DMA_W_CHANNEL->CMBA  = (u32)&send_data;	//设置要发送的数据地址
+    USART1_DMA_W_CHANNEL->TCNT = send_data_len;    //设置要发送数据的长度
+    DMA_ChannelEnable(USART1_DMA_W_CHANNEL,ENABLE);//使能DMA通道
+}
+
+u8 usart2_send_paper(u8 *send_data,u16 send_data_len)
+{
+    DMA_ClearFlag(USART2_DMA_SEND_FINISH);
+    USART2_DMA_W_CHANNEL->CMBA  = (u32)&send_data;	//设置要发送的数据地址
+    USART2_DMA_W_CHANNEL->TCNT = send_data_len;    //设置要发送数据的长度
+    DMA_ChannelEnable(USART2_DMA_W_CHANNEL,ENABLE);//使能DMA通道
+}
+
+u8 check_usart_dma_send_state(struct uart_port *port)
+{
+    return DMA_GetFlagStatus(port->dma_send_finish_flag);
+}
 
 void usart1_config(struct uart_port *port)
 {
@@ -65,7 +81,7 @@ void usart1_config(struct uart_port *port)
     USART_Init(USART1, &USART_InitStructure);
     
 	USART_ClearFlag(USART1,USART_FLAG_TRAC);
-	USART_INTConfig(USART1,USART_INT_IDLEF,ENABLE);
+	USART_INTConfig(USART1,USART_INT_RDNE,ENABLE);
 	USART_Cmd(USART1, ENABLE);
     USART_DMACmd(USART1,USART_DMAReq_Tx|USART_DMAReq_Rx,ENABLE);
 }
@@ -119,7 +135,7 @@ void usart2_config(struct uart_port *port)
     USART_Init(USART2, &USART_InitStructure);
     
 	USART_ClearFlag(USART2,USART_FLAG_TRAC);
-	USART_INTConfig(USART2,USART_INT_IDLEF,ENABLE);
+	USART_INTConfig(USART2,USART_INT_RDNE,ENABLE);
 	USART_Cmd(USART2, ENABLE);
     USART_DMACmd(USART2,USART_DMAReq_Tx|USART_DMAReq_Rx,ENABLE);
 }
@@ -144,21 +160,21 @@ void usart1_dma_config(struct uart_port *port)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
     
-    /*RX_Init*/
-    DMA_Reset(USART1_DMA_R_CHANNEL);
-    DMA_InitStructure.DMA_PeripheralBaseAddr = port->dma_periph_addr;
-    DMA_InitStructure.DMA_MemoryBaseAddr = (u32) port->dma_recv_buff;         
-    DMA_InitStructure.DMA_Direction = DMA_DIR_PERIPHERALSRC;       
-    DMA_InitStructure.DMA_BufferSize = port->dma_recv_max_len;         
-    DMA_InitStructure.DMA_PeripheralInc = DMA_PERIPHERALINC_DISABLE;         
-    DMA_InitStructure.DMA_MemoryInc = DMA_MEMORYINC_ENABLE;         
-    DMA_InitStructure.DMA_PeripheralDataWidth =DMA_PERIPHERALDATAWIDTH_BYTE;         
-    DMA_InitStructure.DMA_MemoryDataWidth = DMA_MEMORYDATAWIDTH_BYTE;         
-    DMA_InitStructure.DMA_Mode = DMA_MODE_CIRCULAR;         
-    DMA_InitStructure.DMA_Priority = DMA_PRIORITY_MEDIUM;        
-    DMA_InitStructure.DMA_MTOM = DMA_MEMTOMEM_DISABLE;
-    DMA_Init(USART1_DMA_R_CHANNEL, &DMA_InitStructure);
-    DMA_ChannelEnable(USART1_DMA_R_CHANNEL,ENABLE);
+//    /*RX_Init*/
+//    DMA_Reset(USART1_DMA_R_CHANNEL);
+//    DMA_InitStructure.DMA_PeripheralBaseAddr = port->dma_periph_addr;
+//    DMA_InitStructure.DMA_MemoryBaseAddr = (u32) port->dma_recv_buff;         
+//    DMA_InitStructure.DMA_Direction = DMA_DIR_PERIPHERALSRC;       
+//    DMA_InitStructure.DMA_BufferSize = port->dma_recv_max_len;         
+//    DMA_InitStructure.DMA_PeripheralInc = DMA_PERIPHERALINC_DISABLE;         
+//    DMA_InitStructure.DMA_MemoryInc = DMA_MEMORYINC_ENABLE;         
+//    DMA_InitStructure.DMA_PeripheralDataWidth =DMA_PERIPHERALDATAWIDTH_BYTE;         
+//    DMA_InitStructure.DMA_MemoryDataWidth = DMA_MEMORYDATAWIDTH_BYTE;         
+//    DMA_InitStructure.DMA_Mode = DMA_MODE_CIRCULAR;         
+//    DMA_InitStructure.DMA_Priority = DMA_PRIORITY_MEDIUM;        
+//    DMA_InitStructure.DMA_MTOM = DMA_MEMTOMEM_DISABLE;
+//    DMA_Init(USART1_DMA_R_CHANNEL, &DMA_InitStructure);
+//    DMA_ChannelEnable(USART1_DMA_R_CHANNEL,ENABLE);
     
 
     /*TX_Init*/
@@ -201,21 +217,21 @@ void usart2_dma_config(struct uart_port *port)
 	NVIC_Init(&NVIC_InitStructure);
 
     /*RX_Init*/
-    DMA_Reset(USART2_DMA_R_CHANNEL);    
-    DMA_InitStructure.DMA_PeripheralBaseAddr = port->dma_periph_addr;
-    DMA_InitStructure.DMA_MemoryBaseAddr = (u32) port->dma_recv_buff;         
-    DMA_InitStructure.DMA_Direction = DMA_DIR_PERIPHERALSRC;       
-    DMA_InitStructure.DMA_BufferSize = port->dma_recv_max_len;         
-    DMA_InitStructure.DMA_PeripheralInc = DMA_PERIPHERALINC_DISABLE;         
-    DMA_InitStructure.DMA_MemoryInc = DMA_MEMORYINC_ENABLE;         
-    DMA_InitStructure.DMA_PeripheralDataWidth = DMA_PERIPHERALDATAWIDTH_BYTE;         
-    DMA_InitStructure.DMA_MemoryDataWidth = DMA_MEMORYDATAWIDTH_BYTE;         
-    DMA_InitStructure.DMA_Mode = DMA_MODE_CIRCULAR;         
-    DMA_InitStructure.DMA_Priority = DMA_PRIORITY_MEDIUM;        
-    DMA_InitStructure.DMA_MTOM = DMA_MEMTOMEM_DISABLE;
-    
-    DMA_Init( USART2_DMA_R_CHANNEL, &DMA_InitStructure);
-    DMA_ChannelEnable( USART2_DMA_R_CHANNEL,ENABLE);
+//    DMA_Reset(USART2_DMA_R_CHANNEL);    
+//    DMA_InitStructure.DMA_PeripheralBaseAddr = port->dma_periph_addr;
+//    DMA_InitStructure.DMA_MemoryBaseAddr = (u32) port->dma_recv_buff;         
+//    DMA_InitStructure.DMA_Direction = DMA_DIR_PERIPHERALSRC;       
+//    DMA_InitStructure.DMA_BufferSize = port->dma_recv_max_len;         
+//    DMA_InitStructure.DMA_PeripheralInc = DMA_PERIPHERALINC_DISABLE;         
+//    DMA_InitStructure.DMA_MemoryInc = DMA_MEMORYINC_ENABLE;         
+//    DMA_InitStructure.DMA_PeripheralDataWidth = DMA_PERIPHERALDATAWIDTH_BYTE;         
+//    DMA_InitStructure.DMA_MemoryDataWidth = DMA_MEMORYDATAWIDTH_BYTE;         
+//    DMA_InitStructure.DMA_Mode = DMA_MODE_CIRCULAR;         
+//    DMA_InitStructure.DMA_Priority = DMA_PRIORITY_MEDIUM;        
+//    DMA_InitStructure.DMA_MTOM = DMA_MEMTOMEM_DISABLE;
+//    
+//    DMA_Init( USART2_DMA_R_CHANNEL, &DMA_InitStructure);
+//    DMA_ChannelEnable( USART2_DMA_R_CHANNEL,ENABLE);
     
     /*TX_Init*/
     DMA_Reset(USART2_DMA_W_CHANNEL);

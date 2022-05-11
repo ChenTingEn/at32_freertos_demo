@@ -172,12 +172,10 @@ int uart_wait_recv_data(u8 uart_id,u8 *data,TickType_t timeout)
         return -1;
 }
 
-
 int uart_send_data(u8 uart_id,u8 *send_data,u16 send_data_len,u16 timeout)
 {
     struct uart_port *port;
     u16 timeout_count = 0;
-    DMA_Channel_Type *USART_DMA_CHANNEL;//中转DMA通道定义
     
     if(uart_id >= UART_MAX_ID || send_data == NULL)
         return -1;
@@ -189,20 +187,14 @@ int uart_send_data(u8 uart_id,u8 *send_data,u16 send_data_len,u16 timeout)
     switch(uart_id)
     {
         case UART1_ID:
-            USART_DMA_CHANNEL = port->DMA_w_Channel;
-            DMA_ClearFlag(port->dma_send_finish_flag);
+            usart1_send_paper(send_data,send_data_len);
             break;
         case UART2_ID:
-            USART_DMA_CHANNEL = port->DMA_r_Channel;
-            DMA_ClearFlag(port->dma_send_finish_flag);
+            usart2_send_paper(send_data,send_data_len);
             break;
     }
-
-    USART_DMA_CHANNEL->CMBA  = (u32)&send_data;	//设置要发送的数据地址
-	USART_DMA_CHANNEL->TCNT = send_data_len;    //设置要发送数据的长度
-    DMA_ChannelEnable(USART_DMA_CHANNEL,ENABLE);//使能DMA通道
     
-    while(DMA_GetFlagStatus(port->dma_send_finish_flag) == RESET)//超时
+    while(check_usart_dma_send_state(port) == RESET)//超时
     {
         timeout_count++;
         if(timeout_count > timeout)
@@ -286,9 +278,9 @@ void usart1_callback(void)
     BaseType_t	pxHigherPriorityTaskWoken = pdFALSE;
     //    struct uart_queue_msg *qmsg;
     
-    DMA_ChannelEnable(USART1_DMA_R_CHANNEL, DISABLE);
-    DMA_ClearFlag( USART1_DMA_REC_FINISH );
-    USART1_CurrDataCounter = USART1_RECBUFF_SIZE - DMA_GetCurrDataCounter(USART1_DMA_R_CHANNEL);
+//    DMA_ChannelEnable(USART1_DMA_R_CHANNEL, DISABLE);
+//    DMA_ClearFlag( USART1_DMA_REC_FINISH );
+//    USART1_CurrDataCounter = USART1_RECBUFF_SIZE - DMA_GetCurrDataCounter(USART1_DMA_R_CHANNEL);
 //    QueueHandle_t xReturn = uart_port_queue_get(UART1_ID);
         
 
@@ -303,8 +295,8 @@ void usart1_callback(void)
 //        xQueueSendFromISR(xReturn,qmsg->data,&pxHigherPriorityTaskWoken);
     xSemaphoreGiveFromISR(xsemaphore_recf1_get(),&pxHigherPriorityTaskWoken);
         
-    USART1_DMA_R_CHANNEL->TCNT = USART1_RECBUFF_SIZE;
-    DMA_ChannelEnable(USART1_DMA_R_CHANNEL, ENABLE);
+//    USART1_DMA_R_CHANNEL->TCNT = USART1_RECBUFF_SIZE;
+//    DMA_ChannelEnable(USART1_DMA_R_CHANNEL, ENABLE);
 
     USART_ReceiveData( USART1_COM ); // Clear IDLE interrupt flag bit
     if( pxHigherPriorityTaskWoken == pdTRUE )
@@ -318,9 +310,9 @@ void usart2_callback(void)
     BaseType_t	pxHigherPriorityTaskWoken = pdFALSE;
     //    struct uart_queue_msg *qmsg;
     
-    DMA_ChannelEnable(USART2_DMA_R_CHANNEL, DISABLE);
-    DMA_ClearFlag( USART2_DMA_REC_FINISH );
-    USART2_CurrDataCounter = USART2_RECBUFF_SIZE - DMA_GetCurrDataCounter(USART2_DMA_R_CHANNEL);
+//    DMA_ChannelEnable(USART2_DMA_R_CHANNEL, DISABLE);
+//    DMA_ClearFlag( USART2_DMA_REC_FINISH );
+//    USART2_CurrDataCounter = USART2_RECBUFF_SIZE - DMA_GetCurrDataCounter(USART2_DMA_R_CHANNEL);
 //    QueueHandle_t xReturn = uart_port_queue_get(UART1_ID);
         
 
@@ -335,8 +327,8 @@ void usart2_callback(void)
 //        xQueueSendFromISR(xReturn,qmsg->data,&pxHigherPriorityTaskWoken);
     xSemaphoreGiveFromISR(xsemaphore_recf2_get(),&pxHigherPriorityTaskWoken);
         
-    USART2_DMA_R_CHANNEL->TCNT = USART2_RECBUFF_SIZE;
-    DMA_ChannelEnable(USART2_DMA_R_CHANNEL, ENABLE);
+//    USART2_DMA_R_CHANNEL->TCNT = USART2_RECBUFF_SIZE;
+//    DMA_ChannelEnable(USART2_DMA_R_CHANNEL, ENABLE);
 
     USART_ReceiveData( USART2_COM ); // Clear IDLE interrupt flag bit
     if( pxHigherPriorityTaskWoken == pdTRUE )
