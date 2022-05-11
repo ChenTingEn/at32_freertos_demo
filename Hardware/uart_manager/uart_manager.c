@@ -306,31 +306,21 @@ void usart1_callback(void)
 
 void usart2_callback(void)
 {
-    u16 USART2_CurrDataCounter;
+    u8 USART2_REC = 0;
     BaseType_t	pxHigherPriorityTaskWoken = pdFALSE;
-    //    struct uart_queue_msg *qmsg;
-    
-//    DMA_ChannelEnable(USART2_DMA_R_CHANNEL, DISABLE);
-//    DMA_ClearFlag( USART2_DMA_REC_FINISH );
-//    USART2_CurrDataCounter = USART2_RECBUFF_SIZE - DMA_GetCurrDataCounter(USART2_DMA_R_CHANNEL);
-//    QueueHandle_t xReturn = uart_port_queue_get(UART1_ID);
-        
+    struct uart_queue_msg qmsg;
 
-//        qmsg = (struct uart_queue_msg *)pvPortMalloc(sizeof(struct uart_queue_msg));
-//        if(qmsg == NULL)
-//            return ;
-//        
-//        qmsg->ID = UART1_ID;
-//        qmsg->len = USART1_CurrDataCounter;
-//        memcpy(qmsg->data,uart_port_rxbuff_get(UART1_ID),USART1_CurrDataCounter);
-//        
-//        xQueueSendFromISR(xReturn,qmsg->data,&pxHigherPriorityTaskWoken);
+    QueueHandle_t xReturn = uart_port_queue_get(UART2_ID);
+    USART2_REC = USART_ReceiveData( USART2_COM );
+
+    qmsg.ID = UART2_ID;
+    qmsg.len = 1;
+    qmsg.data[0] =  USART2_REC;
+
+    xQueueSendFromISR(xReturn,&qmsg,&pxHigherPriorityTaskWoken);
     xSemaphoreGiveFromISR(xsemaphore_recf2_get(),&pxHigherPriorityTaskWoken);
-        
-//    USART2_DMA_R_CHANNEL->TCNT = USART2_RECBUFF_SIZE;
-//    DMA_ChannelEnable(USART2_DMA_R_CHANNEL, ENABLE);
 
-    USART_ReceiveData( USART2_COM ); // Clear IDLE interrupt flag bit
+    USART_ReceiveData( USART2_COM );
     if( pxHigherPriorityTaskWoken == pdTRUE )
         taskYIELD();
 
