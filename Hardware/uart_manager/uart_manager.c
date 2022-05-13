@@ -187,10 +187,10 @@ int uart_send_data(u8 uart_id,u8 *send_data,u16 send_data_len,u16 timeout)
     switch(uart_id)
     {
         case UART1_ID:
-            usart1_send_paper(send_data,send_data_len);
+            usart1_send_paper(port,send_data,send_data_len);
             break;
         case UART2_ID:
-            usart2_send_paper(send_data,send_data_len);
+            usart2_send_paper(port,send_data,send_data_len);
             break;
     }
     
@@ -235,12 +235,14 @@ static int uart_dma_init(struct uart_port *port)//DMA初始化分支
     {
         goto malloc_send_buff_error;
     }
+    //memcpy(port->dma_send_buff,0,port->dma_send_max_len);
     port->dma_recv_buff = (u8 *)pvPortMalloc(port->dma_recv_max_len);//接收BUFF分配
     if(port->dma_recv_buff == NULL)
     {
         goto malloc_recv_buff_error;
     }
-
+    //memcpy(port->dma_recv_buff,0,port->dma_recv_max_len);
+    
     switch(port->parameter.uart_id)
     {
         case UART1_ID:

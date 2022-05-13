@@ -15,18 +15,28 @@ u8 usart2_enable_get(void)
         return -1;
 }
 
-u8 usart1_send_paper(u8 *send_data,u16 send_data_len)
+u8 usart1_send_paper(struct uart_port *port,u8 *send_data,u16 send_data_len)//USE DMA BLOCK
 {
+    if( port->dma_send_buff != NULL)
+        memcpy(port->dma_send_buff,send_data,send_data_len);
+    else
+        while(1);
+    
     DMA_ClearFlag(USART1_DMA_SEND_FINISH);
-    USART1_DMA_W_CHANNEL->CMBA  = (u32)&send_data;	//设置要发送的数据地址
+    //USART1_DMA_W_CHANNEL->CMBA = (u32)&port->dma_send_buff;	//设置要发送的数据地址
     USART1_DMA_W_CHANNEL->TCNT = send_data_len;    //设置要发送数据的长度
     DMA_ChannelEnable(USART1_DMA_W_CHANNEL,ENABLE);//使能DMA通道
 }
 
-u8 usart2_send_paper(u8 *send_data,u16 send_data_len)
+u8 usart2_send_paper(struct uart_port *port,u8 *send_data,u16 send_data_len)//USE DMA BLOCK
 {
+    if( port->dma_send_buff != NULL)
+        memcpy(port->dma_send_buff,send_data,send_data_len);
+    else
+        while(1);
+    
     DMA_ClearFlag(USART2_DMA_SEND_FINISH);
-    USART2_DMA_W_CHANNEL->CMBA  = (u32)&send_data;	//设置要发送的数据地址
+    //USART2_DMA_W_CHANNEL->CMBA = (u32)&port->dma_send_buff;	//设置要发送的数据地址
     USART2_DMA_W_CHANNEL->TCNT = send_data_len;    //设置要发送数据的长度
     DMA_ChannelEnable(USART2_DMA_W_CHANNEL,ENABLE);//使能DMA通道
 }
@@ -71,7 +81,7 @@ void usart1_config(struct uart_port *port)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;	
 	NVIC_Init(&NVIC_InitStructure);
 	
-	//USART ?????
+	//USART
 	USART_InitStructure.USART_BaudRate = port->parameter.uart_baud_rate;
 	USART_InitStructure.USART_WordLength = port->parameter.art_word_length;
 	USART_InitStructure.USART_StopBits = port->parameter.uart_stop_bits;
@@ -118,14 +128,14 @@ void usart2_config(struct uart_port *port)
     GPIO_InitStructure.GPIO_Pull = GPIO_Pull_NOPULL;
     GPIO_Init(USART2_RX_GPIO_PORT, &GPIO_InitStructure);
     
-	//Usart2 NVIC ??
+	//Usart2 NVIC
     NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQ;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = port->parameter.UART_Parity;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 	
-	//USART ?????
+	//USART
 	USART_InitStructure.USART_BaudRate = port->parameter.uart_baud_rate;
 	USART_InitStructure.USART_WordLength = port->parameter.art_word_length;
 	USART_InitStructure.USART_StopBits = port->parameter.uart_stop_bits;
@@ -192,7 +202,8 @@ void usart1_dma_config(struct uart_port *port)
     DMA_InitStructure.DMA_MTOM = DMA_MEMTOMEM_DISABLE;
     
     DMA_Init( USART1_DMA_W_CHANNEL, &DMA_InitStructure);
-    USART_DMACmd(port->com_port, USART_DMAReq_Rx, ENABLE);
+    USART_DMACmd(port->com_port, USART_DMAReq_Tx, ENABLE);
+    DMA_INTConfig(USART1_DMA_W_CHANNEL,DMA_INT_TC,ENABLE);
     DMA_ChannelEnable( USART1_DMA_W_CHANNEL, DISABLE);
 }
 
@@ -248,6 +259,7 @@ void usart2_dma_config(struct uart_port *port)
     DMA_InitStructure.DMA_MTOM = DMA_MEMTOMEM_DISABLE;
     
     DMA_Init( USART2_DMA_W_CHANNEL, &DMA_InitStructure);
-    USART_DMACmd(port->com_port, USART_DMAReq_Rx, ENABLE);
+    USART_DMACmd(port->com_port, USART_DMAReq_Tx, ENABLE);
+    DMA_INTConfig(USART2_DMA_W_CHANNEL,DMA_INT_TC,ENABLE);
     DMA_ChannelEnable( USART2_DMA_W_CHANNEL, DISABLE);
 }

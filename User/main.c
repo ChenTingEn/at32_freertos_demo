@@ -23,8 +23,8 @@
 #define USART2_TASK_STACK_SIZE 100
 #define LED_TASK_STACK_SIZE 100
 /* Private function prototypes -----------------------------------------------*/
-u8 u1recebuff[USART2_MAX_RX_LEN] = {0};
-u8 u2recebuff[USART2_MAX_RX_LEN] = {0};
+u8 u1recebuff[UART_RECV_QUEUE_MSG_DATA_MAX_LEN] = {0};
+u8 u2recebuff[UART_RECV_QUEUE_MSG_DATA_MAX_LEN] = {0};
 u8 usart2_waitread = 0;
 extern struct _uart_manager uart_manager;
 /* Private functions ---------------------------------------------------------*/
@@ -94,9 +94,9 @@ static void uart1_task_Function(void *pvParameters)
     while(1)
     {
         if(xSemaphoreTake(xsemaphore_recf1_get(),10) != pdFALSE){//portMAX_DELAY
-            xQueueReceive(uart_port_queue_get(UART1_ID),u1recebuff,0);
-            memcpy(u1recebuff , uart_port_rxbuff_get(UART1_ID), uart_port_rxbuffsize_get(UART1_ID) );
-            uart_send_data(UART1_ID,u1recebuff,sizeof(u1recebuff),1);
+            if( xQueueReceive(uart_port_queue_get(UART1_ID),u1recebuff,0) > 0)
+            //memcpy(u1recebuff , uart_port_rxbuff_get(UART1_ID), uart_port_rxbuffsize_get(UART1_ID) );
+                uart_send_data(UART1_ID,u1recebuff,sizeof(u1recebuff),10);
             
         }
 //        vTaskDelay(10);
@@ -121,9 +121,10 @@ static void uart2_task_Function(void *pvParameters)
     {
         if(xSemaphoreTake(xsemaphore_recf2_get(), 10) != pdFALSE)
         {
-            uart_wait_recv_data(UART2_ID,u2recebuff,1);
+            if( uart_wait_recv_data(UART2_ID,u2recebuff,1) > 0)
+                uart_send_data(UART2_ID,u2recebuff,1,10);
             //memcpy(u2recebuff , uart_port_rxbuff_get(UART2_ID), uart_port_rxbuffsize_get(UART2_ID) );
-            
+            //发任务通知
         }
             
 //        vTaskDelay(1);

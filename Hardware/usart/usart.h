@@ -117,7 +117,7 @@ void usart2_config(struct uart_port *port);
 void usart2_dma_config(struct uart_port *port);
 u8 usart1_enable_get(void);
 u8 usart2_enable_get(void);
-u8 usart1_send_paper(u8 *send_data,u16 send_data_len);
-u8 usart2_send_paper(u8 *send_data,u16 send_data_len);
+u8 usart1_send_paper(struct uart_port *port,u8 *send_data,u16 send_data_len);
+u8 usart2_send_paper(struct uart_port *port,u8 *send_data,u16 send_data_len);
 u8 check_usart_dma_send_state(struct uart_port *port);
 #endif

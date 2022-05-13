@@ -190,9 +190,9 @@ void DMA1_Channel3_2_IRQHandler(void)
 
 void DMA1_Channel7_4_IRQHandler(void)
 {
-    if( DMA_GetFlagStatus(DMA1_INT_TC4) != RESET )
+    if( DMA_GetFlagStatus(DMA1_FLAG_TC4) != RESET )
     {
-        DMA_ClearITPendingBit(DMA1_INT_TC4);
+        DMA_ClearITPendingBit(DMA1_FLAG_TC4);
         DMA_ChannelEnable(USART2_DMA_W_CHANNEL,DISABLE);
     }
 }
