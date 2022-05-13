@@ -300,10 +300,8 @@ void usart1_callback(void)
 //    USART1_DMA_R_CHANNEL->TCNT = USART1_RECBUFF_SIZE;
 //    DMA_ChannelEnable(USART1_DMA_R_CHANNEL, ENABLE);
 
-    USART_ReceiveData( USART1_COM ); // Clear IDLE interrupt flag bit
-    if( pxHigherPriorityTaskWoken == pdTRUE )
-        taskYIELD();
-
+    USART_ReceiveData( USART1_COM );
+    portEND_SWITCHING_ISR(&pxHigherPriorityTaskWoken);
 }
 
 void usart2_callback(void)
@@ -323,9 +321,7 @@ void usart2_callback(void)
     xSemaphoreGiveFromISR(xsemaphore_recf2_get(),&pxHigherPriorityTaskWoken);
 
     USART_ReceiveData( USART2_COM );
-    if( pxHigherPriorityTaskWoken == pdTRUE )
-        taskYIELD();
-
+    portEND_SWITCHING_ISR(&pxHigherPriorityTaskWoken);
 }
 
 //void DMA_USART_Tx_Data(u32 size)
